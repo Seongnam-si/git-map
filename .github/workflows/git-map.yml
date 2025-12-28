@@ -1,4 +1,4 @@
-name: Debug GitHub Commit Context
+name: Send commit to Git Map
 
 on:
   push:
@@ -6,13 +6,22 @@ on:
       - main
 
 jobs:
-  debug:
+  send-commit:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Print commit info
+      - name: Send commit payload to Supabase Edge Function
         run: |
-          echo "repo=${{ github.repository }}"
-          echo "sha=${{ github.sha }}"
-          echo "branch=${{ github.ref_name }}"
-          echo "message=${{ github.event.head_commit.message }}"
-          echo "time=${{ github.event.head_commit.timestamp }}"\
+          curl -X POST https://wrbyuqqtpdrvudgtskaq.supabase.co/functions/v1/commit \
+            -H "Authorization: Bearer ${{ secrets.GITMAP_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "repo_full_name": "${{ github.repository }}",
+              "repo_url": "https://github.com/${{ github.repository }}",
+              "branch": "${{ github.ref_name }}",
+              "commit_hash": "${{ github.sha }}",
+              "commit_message": "${{ github.event.head_commit.message }}",
+              "committed_at": "${{ github.event.head_commit.timestamp }}",
+              "source": "github-action"
+            }'
+            
