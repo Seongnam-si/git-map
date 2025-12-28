@@ -1,0 +1,18 @@
+name: Debug GitHub Commit Context
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print commit info
+        run: |
+          echo "repo=${{ github.repository }}"
+          echo "sha=${{ github.sha }}"
+          echo "branch=${{ github.ref_name }}"
+          echo "message=${{ github.event.head_commit.message }}"
+          echo "time=${{ github.event.head_commit.timestamp }}"\
