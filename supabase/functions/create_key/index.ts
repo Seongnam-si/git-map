@@ -65,6 +65,26 @@ Deno.serve(async (req) => {
     });
   }
 
+  const { error: userUpsertError } = await supabase
+  .from("users")
+  .upsert(
+    { id: user.id },
+    { onConflict: "id" }
+  );
+
+  if (userUpsertError) {
+    console.error("users upsert error:", userUpsertError);
+    return new Response(
+    JSON.stringify({ error: "Failed to sync user" }),
+    {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
   const apiKey = generateApiKey();
   const keyHash = await sha256(apiKey);
 
