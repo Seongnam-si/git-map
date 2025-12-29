@@ -11,33 +11,38 @@ function App() {
     });
   };
 
-  useEffect(() => {
-    const handleSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+  const createApiKey = async () => {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
 
-      if (!session) return;
+    if (!session) return;
 
-      const { error } = await supabase.from("users").upsert(
-        {
-          id: session.user.id,
-          github_username: session.user.user_metadata.preferred_username,
+    const res = await fetch(
+      "https://wrbyuqqtpdrvudgtskaq.supabase.co/functions/v1/create_key",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
         },
-        { onConflict: "id" }
-      );
-
-      if (error) {
-        console.error("User upsert error:", error);
-      } else {
-        console.log("users upsert 성공");
       }
-    };
+    )
 
-    handleSession();
-  }, []);
+    const data = await res.json();
 
-  return <button onClick={loginToGithub}>GitHub 로그인</button>;
+    alert(
+      `다음 키값은 지금 한 번만 노출 됩니다. 해당 키를 복사해주세요.\n${data.api_key}`
+    );
+  };
+
+  return (
+    <div style={{ padding: 30 }}>
+      <button onClick={loginToGithub}>깃허브 로그인</button>
+      <br />
+      <br />
+      <button onClick={createApiKey}>API Key 발급</button>
+    </div>
+  );
 }
 
 export default App;
