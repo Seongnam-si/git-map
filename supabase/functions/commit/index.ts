@@ -6,19 +6,19 @@ async function sha256(input: string): Promise<string> {
   const data = encoder.encode(input);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
 Deno.serve(async (req) => {
-
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  const apiKey = req.headers.get("apikey");
+  const payload = await req.json();
+
+  const apiKey = payload.api_key;
   if (!apiKey) {
-    return new Response("Missing apikey header", { status: 401 });
+    return new Response("Missing api_key", { status: 401 });
   }
 
   const supabase = createClient(
@@ -39,7 +39,6 @@ Deno.serve(async (req) => {
   }
 
   const userId = keyRow.user_id;
-  const payload = await req.json();
 
   const { error: insertError } = await supabase
     .from("commits")
@@ -51,6 +50,8 @@ Deno.serve(async (req) => {
       commit_hash: payload.commit_hash,
       commit_message: payload.commit_message,
       committed_at: payload.committed_at,
+      country: payload.country,
+      city: payload.city,
       source: payload.source,
     });
 
@@ -60,7 +61,7 @@ Deno.serve(async (req) => {
   }
 
   return new Response(
-    JSON.stringify({ message: "commit saved (api key auth)" }),
+    JSON.stringify({ message: "commit saved (body api key auth)" }),
     { headers: { "Content-Type": "application/json" } }
   );
 });
