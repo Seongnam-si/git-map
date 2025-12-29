@@ -38,11 +38,31 @@ Deno.serve(async (req) => {
   console.log("✅ user:", user.id);
   console.log("📦 commit payload:", payload);
 
+  const { error: insertError } = await supabase
+    .from("commits")
+    .insert({
+      user_id: user.id,
+      repo_full_name: payload.repo_full_name,
+      repo_url: payload.repo_url,
+      branch: payload.branch,
+      commit_hash: payload.commit_hash,
+      commit_message: payload.commit_message,
+      committed_at: payload.committed_at,
+      source: payload.source,
+    });
+
+  if (insertError) {
+    console.error("❌ DB insert error:", insertError);
+    return new Response(
+      JSON.stringify({ message: "insert failed" }),
+      { status: 500 }
+    );
+  }
+
   return new Response(
     JSON.stringify({
-      message: "commit payload received",
+      message: "commit saved",
       user_id: user.id,
-      payload,
     }),
     { headers: { "Content-Type": "application/json" } }
   );
