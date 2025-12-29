@@ -1,47 +1,50 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js";
 
+async function sha256(input: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 Deno.serve(async (req) => {
 
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader) {
-    return new Response("Missing Authorization header", { status: 401 });
+  const apiKey = req.headers.get("apikey");
+  if (!apiKey) {
+    return new Response("Missing apikey header", { status: 401 });
   }
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_ANON_KEY")!,
-    {
-      global: {
-        headers: {
-          Authorization: authHeader,
-        },
-      },
-    }
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  const keyHash = await sha256(apiKey);
 
-  if (authError || !user) {
-    return new Response("Unauthorized", { status: 401 });
+  const { data: keyRow, error: keyError } = await supabase
+    .from("api_keys")
+    .select("user_id, is_active")
+    .eq("key_hash", keyHash)
+    .single();
+
+  if (keyError || !keyRow || !keyRow.is_active) {
+    return new Response("Invalid API Key", { status: 401 });
   }
 
+  const userId = keyRow.user_id;
   const payload = await req.json();
-
-  console.log("✅ user:", user.id);
-  console.log("📦 commit payload:", payload);
 
   const { error: insertError } = await supabase
     .from("commits")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       repo_full_name: payload.repo_full_name,
       repo_url: payload.repo_url,
       branch: payload.branch,
@@ -52,18 +55,12 @@ Deno.serve(async (req) => {
     });
 
   if (insertError) {
-    console.error("❌ DB insert error:", insertError);
-    return new Response(
-      JSON.stringify({ message: "insert failed" }),
-      { status: 500 }
-    );
+    console.error("DB insert error:", insertError);
+    return new Response("Insert failed", { status: 500 });
   }
 
   return new Response(
-    JSON.stringify({
-      message: "commit saved",
-      user_id: user.id,
-    }),
+    JSON.stringify({ message: "commit saved (api key auth)" }),
     { headers: { "Content-Type": "application/json" } }
   );
 });
