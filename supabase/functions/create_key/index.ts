@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
     user_id: user.id,
     key_hash: keyHash,
     name: "default",
+    is_active: true,
   });
 
   if (insertError) {
