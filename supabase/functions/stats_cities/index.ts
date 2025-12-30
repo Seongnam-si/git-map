@@ -1,0 +1,88 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js";
+
+async function sha256(input: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+Deno.serve(async (req) => {
+  if (req.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  const payload = await req.json();
+  const apiKey = payload.api_key;
+
+  if (!apiKey) {
+    return new Response(
+      JSON.stringify({ error: "Missing api_key" }),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  const keyHash = await sha256(apiKey);
+
+  const { data: keyRow, error: keyError } = await supabase
+    .from("api_keys")
+    .select("user_id, is_active")
+    .eq("key_hash", keyHash)
+    .single();
+
+  if (keyError || !keyRow || !keyRow.is_active) {
+    return new Response(
+      JSON.stringify({ error: "Invalid API Key" }),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const userId = keyRow.user_id;
+
+  const { data: rows, error: statsError } = await supabase
+    .rpc("stats_cities_by_user", { uid: userId });
+
+  if (statsError) {
+    console.error("stats query error:", statsError);
+    return new Response(
+      JSON.stringify({ error: "Stats query failed" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  if (!rows || rows.length === 0) {
+    return new Response(
+      JSON.stringify({
+        total: 0,
+        cities: [],
+      }),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const totalCommits = rows.reduce(
+    (sum: number, row: any) => sum + Number(row.count),
+    0
+  );
+
+  const cities = rows.map((row: any) => ({
+    city: row.city,
+    count: Number(row.count),
+    percentage: Math.round((Number(row.count) / totalCommits) * 100),
+  }));
+
+  return new Response(
+    JSON.stringify({
+      total: totalCommits,
+      cities,
+    }),
+    { headers: { "Content-Type": "application/json" } }
+  );
+});
