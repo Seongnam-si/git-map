@@ -1,0 +1,46 @@
+#!/bin/bash
+
+CONFIG="$HOME/.gitmap/config"
+
+if [ ! -f "$CONFIG" ]; then
+  echo "❌ GitMap config not found (~/.gitmap/config)"
+  exit 0
+fi
+
+source "$CONFIG"
+
+if [ -z "$API_KEY" ] || [ -z "$ENDPOINT" ]; then
+  echo "❌ API_KEY or ENDPOINT missing in config"
+  exit 0
+fi
+
+COMMIT_HASH=$(git rev-parse HEAD)
+COMMIT_MESSAGE=$(git log -1 --pretty=%B | tr -d '\n')
+BRANCH=$(git branch --show-current)
+REPO_URL=$(git config --get remote.origin.url)
+REPO_FULL_NAME=$(basename -s .git "$REPO_URL")
+COMMITTED_AT=$(date -Iseconds)
+
+COUNTRY=$(curl -s https://ipinfo.io/country || echo null)
+CITY=$(curl -s https://ipinfo.io/city || echo null)
+
+PAYLOAD=$(cat <<EOF
+{
+  "api_key": "$API_KEY",
+  "repo_full_name": "$REPO_FULL_NAME",
+  "repo_url": "$REPO_URL",
+  "branch": "$BRANCH",
+  "commit_hash": "$COMMIT_HASH",
+  "commit_message": "$COMMIT_MESSAGE",
+  "committed_at": "$COMMITTED_AT",
+  "country": "$COUNTRY",
+  "city": "$CITY",
+  "source": "local-git-hook"
+}
+EOF
+)
+
+curl -s -X POST "$ENDPOINT" \
+  -H "Content-Type: application/json" \
+  -d "$PAYLOAD" \
+  > /dev/null  
