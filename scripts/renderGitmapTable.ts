@@ -9,6 +9,8 @@ type GitmapStats = {
 	cities: CityStats[];
 }
 
+const BAR_WIDTH = 20;
+
 const renderGitmapTable = (stats: GitmapStats | null): string => {
 	if (!stats || !stats.cities || stats.cities.length === 0) {
 		return  `🗺️ GitMap - My Coding Locations
@@ -16,18 +18,19 @@ const renderGitmapTable = (stats: GitmapStats | null): string => {
 _No commit data yet_`;
 	}
 
-	const header = `🗺️ GitMap - My Coding Locations
-
-| City | % |
-|------|---|`;
+	const header = `🗺️ GitMap - My Coding Locations`;
 
   const rows = stats.cities
     .slice(0, 5)
-    .map(({ city, percentage }) => `| ${city} | ${percentage}% |`)
-    .join("\n");
+    .map(({ city, percentage }) => {
+      const filled = Math.round((percentage / 100) * BAR_WIDTH);
+      const empty = BAR_WIDTH - filled;
+      const bar = "█".repeat(filled) + "░".repeat(empty);
 
-  return `${header}
-${rows}`;
+      return `| ${city} | ${bar} ${percentage}% |`;
+	});
+
+  return [header, ...rows].join("\n");
 };
 
 export default renderGitmapTable;
