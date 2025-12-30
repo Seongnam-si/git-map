@@ -1,0 +1,44 @@
+name: GitMap - Update README
+
+on:
+  schedule:
+    - cron: "0 15 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Update README with GitMap stats
+        run: npx tsx scripts/updateReadme.ts
+        env:
+          GITMAP_STATS_ENDPOINT: ${{ secrets.GITMAP_STATS_ENDPOINT }}
+          GITMAP_API_KEY: ${{ secrets.GITMAP_API_KEY }}
+
+      - name: Commit README changes
+        run: |
+          git config user.name "gitmap-bot"
+          git config user.email "gitmap-bot@users.noreply.github.com"
+
+          if git diff --quiet; then
+            echo "No README changes to commit"
+          else
+            git add README.md
+            git commit -m "chore: update GitMap coding locations"
+          fi
+
+      - name: Push changes
+        run: git push
