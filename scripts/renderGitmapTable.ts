@@ -9,7 +9,7 @@ type GitmapStats = {
 	cities: CityStats[];
 }
 
-const BAR_WIDTH = 20;
+const BAR_WIDTH = 10;
 
 const renderGitmapTable = (stats: GitmapStats | null): string => {
 	if (!stats || !stats.cities || stats.cities.length === 0) {
@@ -30,7 +30,7 @@ _No commit data yet_`;
       return `| ${city} | ${bar} ${percentage}% |`;
 	});
 
-  return [header, ...rows].join("\n");
+  return [header, "" , ...rows].join("\n");
 };
 
 export default renderGitmapTable;
