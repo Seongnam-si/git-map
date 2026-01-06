@@ -38,7 +38,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-    {apiKey ? (
+    {!apiKey ? (
       <div className="max-w-md rounded-xl bg-gray-700 p-6 flex flex-col text-center">
         <img src={githubIcon} alt="icon" className="w-16 h-16 mx-auto"/>
         <span className="text-white text-4xl">Gitmap</span>
