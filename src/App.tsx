@@ -10,7 +10,7 @@ function App() {
     await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo: "http://loaclhost:5173/auth/callback"
+        redirectTo: "https://git-map.netlify.app/"
       }
     })
   }
