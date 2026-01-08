@@ -1,73 +1,65 @@
-# React + TypeScript + Vite
+# Gitmap
+### My Commit Locations
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+로컬 Git 커밋 시점을 기준으로 위치를 기록하고, 도시별 커밋 비율 Top 5를 Github README에 시각화합니다.
 
-Currently, two official plugins are available:
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/9c88e031-b40f-4aa5-a5e9-b55939e28667">
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 사용 방법 (4단계)
 
-## React Compiler
+### Step 1. API Key 발급
+Gitmap은 개인 키로 동작합니다. 아래와 같이 키를 발급받아 주세요.  
+(해당 키는 비밀번호처럼 소중하게 다뤄주세요. <span style="background: red">**공개 금지입니다!**</span>)  
+[발급 사이트 바로가기](https://git-map.netlify.app)  
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+<table>
+	<tr>
+		<td>
+			메인 화면
+		</td>
+		<td>
+			깃허브 로그인 후 화면
+		</td>
+		<td>
+			API Key 발급 후 화면
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<img width="500" height="500" alt="Image" src="https://github.com/user-attachments/assets/b9f9d8d7-27f5-45d3-9b13-77be6cadd0b4" />
+		</td>
+		<td>
+			<img width="500" height="500" alt="Image" src="https://github.com/user-attachments/assets/e9e39d2c-3bb7-43b9-b683-70a1e805d825" />
+		</td>
+		<td>
+			<img width="500" height="500" alt="Image" src="https://github.com/user-attachments/assets/7559a829-1bf3-4660-8e24-8102df8e5b0b" />
+		</td>
+	</tr>
+</table>
 
-## Expanding the ESLint configuration
+### Step 2. 1줄 설치
+아래 명령어 한줄을 터미널에 입력해주세요.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+curl -fsSL https://raw.githubusercontent.com/Seongnam-si/git-map/main/install.sh | bash
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+설치 과정에서 1에서 발급받은 API Key를 요구합니다. Key를 입력해주세요.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Step 3. 특정 레포에 훅 연결
+보안에 민감한 사용자를 위해 원하는 레포의 커밋에만 반응합니다.  
+```bash
+cd /path/your_repo_dir
+ln -sf ~/.gitmap/post-commit .git/hooks/post-commit
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Step 4. 리드미에 마커 삽입
+원하는 리드미 파일에 아래 마커를 추가해주세요!
+```
+<!-- GITMAP_START -->
+🗺️ GitMap - My Coding Locations
+
+| Seoul | ██████████ 95% |
+| Haegok | █░░░░░░░░░ 5% |
+<!-- GITMAP_END -->
 ```
