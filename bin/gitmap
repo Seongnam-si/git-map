@@ -1,0 +1,29 @@
+#!/bin/bash
+
+CONFIG="$HOME/.gitmap/config"
+
+case "$1 $2" in
+  "config set")
+    echo "🔑 Enter your GitMap API Key:"
+    read -r API_KEY
+
+    if [ -z "$API_KEY" ]; then
+      echo "❌ API Key cannot be empty"
+      exit 1
+    fi
+
+    cat <<EOF > "$CONFIG"
+API_KEY="$API_KEY"
+ENDPOINT="https://wrbyuqqtpdrvudgtskaq.supabase.co/functions/v1/commit"
+EOF
+
+    echo "✅ API Key 저장 완료 (~/.gitmap/config)"
+    ;;
+
+  *)
+    echo "GitMap CLI"
+    echo ""
+    echo "사용 가능한 명령어:"
+    echo "  gitmap config set   # API Key 설정"
+    ;;
+esac
