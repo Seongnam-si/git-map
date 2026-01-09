@@ -13,12 +13,12 @@ const BAR_WIDTH = 10;
 
 const renderGitmapTable = (stats: GitmapStats | null): string => {
 	if (!stats || !stats.cities || stats.cities.length === 0) {
-		return  `🗺️ GitMap - My Coding Locations
+		return  `🗺️ GitMap - My Commit Locations
 
 _No commit data yet_`;
 	}
 
-	const header = `🗺️ GitMap - My Coding Locations`;
+	const header = `🗺️ GitMap - My Commit Locations`;
 
   const rows = stats.cities
     .slice(0, 5)
