@@ -6,9 +6,11 @@
 <img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/6c1cdb2b-bb79-487c-af9c-dee5f2fd1fb6">
 
 ## 사용 방법 
-💡 최초 1회 설치 이후 Gitmap 사용 레포지토리를 추가하려면 **4번 단계**만 실행해주세요!
 
-### 해당 레포지토리를 Fork 해주세요!
+더 자세한 설치 방법 및 문의 사항은 아래 링크를 클릭해주세요!  
+[상세 설치 방법](https://velog.io/@seongnam-si/%EB%8B%A4%EA%BE%B8-%EA%B9%83%EA%BE%B8-%EA%B9%83%ED%97%88%EB%B8%8C-%EA%BE%B8%EB%AF%B8%EA%B8%B0)
+
+### ***해당 레포지토리를 Fork 해주세요!***
 
 ### Step 1. API Key 발급
 Gitmap은 개인 키로 동작합니다. 아래와 사이트에 방문해 키를 발급받아 주세요.  
@@ -66,7 +68,7 @@ ID -> 123123asdfasdf
 
 Gitmap repo -> Settings -> Secrets and variables -> Actions -> Secrets 
 
-아래 4개를 추가해주세요.   
+아래 3개를 추가해주세요.   
 Name 값은 반드시 아래 예시와 동일하게 작성해주세요!
 
 <table>
@@ -108,3 +110,5 @@ Name 값은 반드시 아래 예시와 동일하게 작성해주세요!
 
 Actions 탭에서 Update Gist 워크플로우를 실행해주세요!  
 Overview 탭에서 gitmap.md pin 지정후 결과물을 확인해주세요!
+
+💡 최초 1회 설치 이후 Gitmap 사용 레포지토리를 추가하려면 **4번 단계**만 실행해주세요!
