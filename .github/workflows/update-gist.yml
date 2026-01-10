@@ -25,7 +25,6 @@ jobs:
       - name: Update GitMap Gist
         run: npx tsx scripts/updateGist.ts
         env:
-          GITMAP_STATS_ENDPOINT: ${{ secrets.GITMAP_STATS_ENDPOINT }}
           GITMAP_API_KEY: ${{ secrets.GITMAP_API_KEY }}
           GITMAP_GIST_ID: ${{ secrets.GITMAP_GIST_ID }}
           GITMAP_GIST_TOKEN: ${{ secrets.GITMAP_GIST_TOKEN }}
