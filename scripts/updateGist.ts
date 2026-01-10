@@ -9,7 +9,7 @@ type StatsResponse = {
 	cities: CityStat[];
 };
 
-const STATS_ENDPOINT = "https://wrbyuqqtpdrvudgtskaq.supabase.co/functions/v1/stats";
+const STATS_ENDPOINT = "https://wrbyuqqtpdrvudgtskaq.supabase.co/functions/v1/stats_cities";
 const API_KEY = process.env.GITMAP_API_KEY!;
 const GIST_ID = process.env.GITMAP_GIST_ID!;
 const GITMAP_GIST_TOKEN = process.env.GITMAP_GIST_TOKEN!;
